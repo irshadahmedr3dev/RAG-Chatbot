@@ -78,11 +78,20 @@ if uploaded_file is not None:
     pdf_bytes = uploaded_file.getvalue()
 
     # Create unique ID for the uploaded PDF
-    file_hash = hashlib.md5(pdf_bytes).hexdigest()
+    file_hash = hashlib.md5(
+        pdf_bytes
+    ).hexdigest()
 
     # Create required folders
-    os.makedirs("uploads", exist_ok=True)
-    os.makedirs("chroma_db", exist_ok=True)
+    os.makedirs(
+        "uploads",
+        exist_ok=True
+    )
+
+    os.makedirs(
+        "chroma_db",
+        exist_ok=True
+    )
 
     # Save uploaded PDF
     pdf_path = os.path.join(
@@ -90,7 +99,11 @@ if uploaded_file is not None:
         uploaded_file.name
     )
 
-    with open(pdf_path, "wb") as f:
+    with open(
+        pdf_path,
+        "wb"
+    ) as f:
+
         f.write(pdf_bytes)
 
     # Unique database for this PDF
@@ -112,6 +125,10 @@ if uploaded_file is not None:
             persist_directory=db_path
         )
 
+        st.info(
+            "Loaded existing vector database."
+        )
+
     else:
 
         with st.spinner(
@@ -119,8 +136,12 @@ if uploaded_file is not None:
         ):
 
             # Load PDF
-            loader = PyPDFLoader(pdf_path)
+            loader = PyPDFLoader(
+                pdf_path
+            )
+
             documents = loader.load()
+
 
             # Split into chunks
             text_splitter = RecursiveCharacterTextSplitter(
@@ -132,6 +153,7 @@ if uploaded_file is not None:
                 documents
             )
 
+
             # Create vector database
             vectorstore = Chroma.from_documents(
                 documents=chunks,
@@ -141,7 +163,8 @@ if uploaded_file is not None:
             )
 
         st.success(
-            f"PDF processed successfully — {len(chunks)} chunks created."
+            f"PDF processed successfully — "
+            f"{len(chunks)} chunks created."
         )
 
 
@@ -156,7 +179,9 @@ if uploaded_file is not None:
 
     if question:
 
-        with st.spinner("Thinking..."):
+        with st.spinner(
+            "Thinking..."
+        ):
 
             # Retrieve relevant chunks
             results = vectorstore.similarity_search(
@@ -164,11 +189,13 @@ if uploaded_file is not None:
                 k=2
             )
 
+
             # Combine retrieved chunks
             context = "\n\n".join(
                 result.page_content
                 for result in results
             )
+
 
             # Create prompt
             prompt = f"""
@@ -185,30 +212,42 @@ say that the information is not available
 in the provided document.
 """
 
+
             # Generate answer
-            response = llm.invoke(prompt)
+            response = llm.invoke(
+                prompt
+            )
 
 
         # --------------------------------------------------
         # Display answer
         # --------------------------------------------------
 
-        st.subheader("Answer")
+        st.subheader(
+            "Answer"
+        )
 
-        st.write(response.content)
+        st.write(
+            response.content
+        )
 
 
         # --------------------------------------------------
         # Display sources
         # --------------------------------------------------
 
-        st.subheader("Sources")
+        st.subheader(
+            "Sources"
+        )
 
         sources = []
 
+
         for result in results:
 
-            page = result.metadata.get("page")
+            page = result.metadata.get(
+                "page"
+            )
 
             if page is not None:
 
@@ -224,9 +263,14 @@ in the provided document.
                 )
 
                 if source_info not in sources:
-                    sources.append(source_info)
+
+                    sources.append(
+                        source_info
+                    )
 
 
         for source in sources:
 
-            st.write(source)
+            st.write(
+                source
+            )
