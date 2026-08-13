@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+
+.agents/
+
+uploads/
+chroma_db/
+
+.env
+.venv/
+venv/
+
+*.pdf
