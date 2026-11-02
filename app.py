@@ -7,7 +7,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
-from langchain_ollama import ChatOllama
+from google import genai
 
 
 # --------------------------------------------------
@@ -55,10 +55,11 @@ def load_embeddings():
 
 @st.cache_resource
 def load_llm():
-
-    return ChatOllama(
-        model="qwen3:4b"
-    )
+    api_key = st.secrets.get("GEMINI_API_KEY")
+    if not api_key:
+        st.error("Add GEMINI_API_KEY in your app's Streamlit Secrets to enable answers.")
+        st.stop()
+    return genai.Client(api_key=api_key)
 
 
 embeddings = load_embeddings()
@@ -214,8 +215,9 @@ in the provided document.
 
 
             # Generate answer
-            response = llm.invoke(
-                prompt
+            response = llm.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
             )
 
 
@@ -228,7 +230,7 @@ in the provided document.
         )
 
         st.write(
-            response.content
+            response.text
         )
 
 
