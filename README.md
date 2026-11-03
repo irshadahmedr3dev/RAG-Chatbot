@@ -25,7 +25,7 @@ The application is built with Python, LangChain, ChromaDB, Hugging Face embeddin
 
 # 🏗️ Architecture
 
-```text
+```text..
                     ┌──────────────────┐
                     │   PDF Upload     │
                     └────────┬─────────┘
